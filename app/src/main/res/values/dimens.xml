@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="currency_value_margin_end">24dp</dimen>
+
+    <dimen name="currency_symbol_margin_start">16dp</dimen>
+    <dimen name="currency_symbol_margin_top">8dp</dimen>
+
+    <dimen name="currency_image_margin">20dp</dimen>
+    <dimen name="currency_image_width_height">70dp</dimen>
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/currency_image"
+        android:layout_width="@dimen/currency_image_width_height"
+        android:layout_height="@dimen/currency_image_width_height"
+        android:layout_margin="@dimen/currency_image_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/currency_symbol"
+        style="@style/CurrencySymbolStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/currency_symbol_margin_start"
+        android:layout_marginTop="@dimen/currency_symbol_margin_top"
+        app:layout_constraintEnd_toEndOf="@+id/currency_name"
+        app:layout_constraintStart_toEndOf="@+id/currency_image"
+        app:layout_constraintTop_toTopOf="@+id/currency_image"
+        tools:text="EUR" />
+
+    <TextView
+        android:id="@+id/currency_name"
+        style="@style/CurrencyNameStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/currency_image"
+        app:layout_constraintStart_toStartOf="@+id/currency_symbol"
+        app:layout_constraintTop_toBottomOf="@id/currency_symbol"
+        app:layout_constraintVertical_bias="0.22000003"
+        tools:text="Euro" />
+
+    <EditText
+        android:id="@+id/currency_value"
+        style="@style/CurrencyValueStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/currency_value_margin_end"
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.050000012"
+        tools:text="9999.99" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
