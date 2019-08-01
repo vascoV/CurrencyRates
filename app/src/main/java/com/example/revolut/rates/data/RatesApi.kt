@@ -1,6 +1,6 @@
-package com.example.revolut.rates.web
+package com.example.revolut.rates.data
 
-import com.example.revolut.rates.web.model.RatesModel
+import com.example.revolut.rates.data.model.RatesModel
 import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Query

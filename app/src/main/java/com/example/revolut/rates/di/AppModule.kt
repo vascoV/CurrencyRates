@@ -1,6 +1,7 @@
 package com.example.revolut.rates.di
 
-import com.example.revolut.rates.web.RatesApi
+import com.example.revolut.rates.data.RatesApi
+import com.example.revolut.rates.data.repository.CurrenciesRepository
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -19,5 +20,10 @@ class AppModule (val retrofit: Retrofit) {
     @Singleton
     fun provideRatesApi(): RatesApi {
         return retrofit.create(RatesApi::class.java)
+    }
+
+    @Provides
+    fun provideCurrenciesRepository() : CurrenciesRepository {
+        return  CurrenciesRepository()
     }
 }
