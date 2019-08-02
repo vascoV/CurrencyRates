@@ -15,6 +15,7 @@ class CurrenciesRepository {
 
     suspend fun getCurrenciesList(base: String): Map<String, Double> {
         val result = ratesApi.getAllRates(base).await()
+
         return result.rates
     }
 }

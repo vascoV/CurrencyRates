@@ -10,6 +10,8 @@ import javax.inject.Inject
 
 class CurrenciesViewModel : ViewModel() {
 
+    private lateinit var myJob: Job
+
     @Inject
     lateinit var repository: CurrenciesRepository
 
@@ -30,5 +32,9 @@ class CurrenciesViewModel : ViewModel() {
         }
 
         return currencies
+    }
+
+    fun cancelJob() {
+        myJob.cancel()
     }
 }

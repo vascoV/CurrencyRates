@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        currenciesViewModel.cancelJob()
         super.onDestroy()
     }
 
