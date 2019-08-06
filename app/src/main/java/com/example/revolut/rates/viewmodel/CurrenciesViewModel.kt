@@ -1,40 +1,75 @@
 package com.example.revolut.rates.viewmodel
 
-import androidx.lifecycle.LiveData
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.Observer
+import com.example.revolut.rates.base.BaseViewModel
+import com.example.revolut.rates.data.model.CurrencyResponse
 import com.example.revolut.rates.data.repository.CurrenciesRepository
 import com.example.revolut.rates.di.Injector
-import kotlinx.coroutines.*
+import com.example.revolut.rates.view.NotifyCurrencies
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableObserver
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class CurrenciesViewModel : ViewModel() {
+class CurrenciesViewModel : BaseViewModel<NotifyCurrencies>() {
 
-    private lateinit var myJob: Job
+    var currencies = MutableLiveData<CurrencyResponse>()
+    var baseCurrency = MutableLiveData<String>()
 
     @Inject
     lateinit var repository: CurrenciesRepository
 
     init {
         Injector.appComponent.inject(this)
+
+        baseCurrency.observeForever(baseCurrencyObserver())
+        currencies.observeForever(latestCurrencyObserver())
     }
 
-    var currencies: MutableLiveData<List<Pair<String, Double>>> = MutableLiveData()
 
-    fun fetchCurrencies(base: String): LiveData<List<Pair<String, Double>>> {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val result = repository.getCurrenciesList(base)
-
-            withContext(Dispatchers.Main){
-                currencies.postValue(result.toList())
-            }
-        }
-
-        return currencies
+    companion object {
+        const val defaultCurrency = "EUR"
+        const val RETRIES = 10L
     }
 
-    fun cancelJob() {
-        myJob.cancel()
+    private fun baseCurrencyObserver() = Observer<String> {
+        compositeDisposable.clear()
+        fetchCurrencies(it)
+    }
+
+    private fun latestCurrencyObserver() = Observer<CurrencyResponse> {
+        notifier?.get()?.updateCurrenciesRateItems(it.base, it.rates)
+    }
+
+    private fun fetchCurrencies(base: String) {
+        compositeDisposable.add(
+            repository.getCurrenciesList(base)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .retry(RETRIES)
+                .subscribeWith(object : DisposableObserver<CurrencyResponse>() {
+                    override fun onComplete() {
+                        Log.d("Observer: ", "COMPLETE")
+                    }
+
+                    override fun onNext(t: CurrencyResponse) {
+                        currencies.value = t
+                        Log.d("Observer: ", "NEXT -> ${t.toString()}")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.d("Observer: ", "ERROR -> ${e.toString()}")
+                        notifier?.get()?.showErrorMessage(e.message)
+                    }
+                })
+        )
+    }
+
+    override fun onCleared() {
+        currencies.removeObserver(latestCurrencyObserver())
+        baseCurrency.removeObserver(baseCurrencyObserver())
+        super.onCleared()
     }
 }

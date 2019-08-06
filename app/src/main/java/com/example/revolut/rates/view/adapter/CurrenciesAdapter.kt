@@ -1,62 +1,144 @@
 package com.example.revolut.rates.view.adapter
 
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.revolut.rates.R
+import com.example.revolut.rates.common.StringToDouble
+import com.example.revolut.rates.common.roundedString
+import com.example.revolut.rates.data.model.Rate
+import com.example.revolut.rates.view.NotifyCurrencies
+import com.jakewharton.rxbinding3.widget.textChanges
 import kotlinx.android.synthetic.main.rates_item.view.*
 
 class CurrenciesAdapter(
-    private var currencyList: MutableList<Pair<String, Double>>
+    private val parentNotifier: NotifyCurrencies
 ) : RecyclerView.Adapter<CurrenciesAdapter.CurrenciesViewHolder>() {
+
+    private var currenciesList: ArrayList<Rate>? = null
+
+    private var currentAmount: Double = 0.0
+
+    private var currentBase = MutableLiveData<String>()
+
+    init {
+        currentBase.observe(parentNotifier as LifecycleOwner, Observer {
+            parentNotifier.newBaseNotify(it)
+        })
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrenciesViewHolder {
         return CurrenciesViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rates_item, parent, false))
     }
 
     override fun getItemCount(): Int {
-        return currencyList.count()
+        return currenciesList?.size ?: 0
     }
 
     override fun onBindViewHolder(holder: CurrenciesViewHolder, position: Int) {
-
-        holder.bind(
-            currencyList[position].first,
-            currencyList[position].second
-        )
+        holder.bind(position)
     }
+
+    private fun setInitBase(base: String) {
+        if (currenciesList?.any { it.code == base } == false) {
+            currenciesList?.add(0, Rate(base, 0.0))
+        }
+
+        updateCurrentBase(base)
+    }
+
+    fun updateCurrencies(base: String, ratesMap: Map<String, Double>) {
+
+        if (currenciesList == null) {
+            currenciesList = ArrayList(ratesMap.map {
+                Rate(it.key, it.value)
+            })
+            notifyDataSetChanged()
+        } else {
+            currenciesList?.forEach {
+                it.rate = ratesMap[it.code]
+            }
+        }
+
+        if (currentBase.value == null) {
+            setInitBase(base)
+        }
+
+        notifyItemRangeChanged(1, itemCount, currentAmount)
+    }
+
+    fun updateCurrentBase(base: String) {
+        currentBase.value = base
+    }
+
+    private fun getCopyofCurrencies(position: Int): Rate {
+        return currenciesList?.get(position)?.copy() ?: Rate.EMPTY
+    }
+
 
     inner class CurrenciesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        fun bind(name: String, value: Double): Unit = with(itemView) {
-            val imageId = resources.getIdentifier("icon_" + name.toLowerCase(), "drawable", context.packageName)
-            currency_image.setImageResource(imageId)
-            currency_name.text = name
-            currency_symbol.text = name
-            currency_value.text = Editable.Factory.getInstance().newEditable(value.toString())
-            currency_value.visibility = if (layoutPosition == 0) View.GONE else View.VISIBLE
+        private val currencyFlag: ImageView = itemView.currency_image
+        private val currencyCode: TextView = itemView.currency_symbol
+        private val currencySymbol: TextView = itemView.currency_name
+        private val currencyAmountEditText: EditText = itemView.currency_value
 
-            this.setOnClickListener {
-                selectItem(this)
+        fun bind(position: Int) {
+            val rate = getCopyofCurrencies(position)
+            renderItems(rate)
+            editTextFocus(rate, position)
+            amountObserver()
+        }
+
+        private fun renderItems(rate: Rate) {
+            val imageId = itemView.resources.getIdentifier(
+                "icon_" + (rate.code)!!.toLowerCase(),
+                "drawable",
+                itemView.context.packageName
+            )
+            currencyCode.text = rate.code
+            currencyFlag.setImageResource(imageId)
+
+            if (rate.code != currentBase.value) {
+                currencyAmountEditText.setText(((rate.rate ?: 0.0) * currentAmount).roundedString())
+            } else {
+                currencyAmountEditText.setText(currentAmount.toString())
             }
         }
 
-        private fun selectItem(view: View) {
-            layoutPosition.takeIf { it > 0 }?.also { currenтPosition ->
-                (currencyList as ArrayList<Pair<String, Double>>).removeAt(currenтPosition).also {
-                    currencyList.add(0, it)
+        private fun editTextFocus(rate: Rate, position: Int) {
+            currencyAmountEditText.setOnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) return@setOnFocusChangeListener
+
+                if (position != 0) {
+                    currenciesList?.removeAt(position).also {
+                        currenciesList?.add(0, rate)
+                    }
+
+                    android.os.Handler().post {
+                        notifyItemMoved(position, 0)
+                    }
+
+                    updateCurrentBase(rate.code!!)
                 }
-
-                notifyItemMoved(currenтPosition, 0)
-                (view.parent as RecyclerView).scrollToPosition(0)
             }
         }
-    }
 
-    fun setCurrencies(currencies: List<Pair<String, Double>>) {
-        currencyList = currencies.toMutableList()
-        notifyDataSetChanged()
+        private fun amountObserver() {
+            apply {
+                currencyAmountEditText.textChanges().subscribe {
+                    if (currencyAmountEditText.isFocused) {
+                        currentAmount = it.toString().StringToDouble()
+                    }
+                }
+            }
+        }
     }
 }

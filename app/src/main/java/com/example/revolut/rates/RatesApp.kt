@@ -7,6 +7,7 @@ import com.example.revolut.rates.di.AppModule
 import com.example.revolut.rates.di.Injector
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
@@ -37,6 +38,7 @@ class RatesApp :Application() {
         retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

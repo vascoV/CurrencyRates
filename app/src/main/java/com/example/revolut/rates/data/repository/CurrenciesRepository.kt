@@ -1,7 +1,10 @@
 package com.example.revolut.rates.data.repository
 
 import com.example.revolut.rates.data.RatesApi
+import com.example.revolut.rates.data.model.CurrencyResponse
 import com.example.revolut.rates.di.Injector
+import io.reactivex.Observable
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CurrenciesRepository {
@@ -13,9 +16,12 @@ class CurrenciesRepository {
         Injector.appComponent.inject(this)
     }
 
-    suspend fun getCurrenciesList(base: String): Map<String, Double> {
-        val result = ratesApi.getAllRates(base).await()
+    companion object {
+        const val REPEAT_RATE = 1L
+    }
 
-        return result.rates
+    fun getCurrenciesList(base: String): Observable<CurrencyResponse> {
+
+        return ratesApi.getAllRates(base).delay(REPEAT_RATE, TimeUnit.SECONDS).repeat()
     }
 }

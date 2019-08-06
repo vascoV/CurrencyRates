@@ -1,50 +1,81 @@
 package com.example.revolut.rates.view
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.revolut.rates.BR
 import com.example.revolut.rates.R
 import com.example.revolut.rates.view.adapter.CurrenciesAdapter
 import com.example.revolut.rates.viewmodel.CurrenciesViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NotifyCurrencies {
 
-    lateinit var currenciesViewModel: CurrenciesViewModel
+    private lateinit var currenciesViewModel: CurrenciesViewModel
 
-    lateinit var currenciesAdapter: CurrenciesAdapter
+    private lateinit var currenciesAdapter: CurrenciesAdapter
+
+    private lateinit var viewDataBinding: ViewDataBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         currenciesViewModel = ViewModelProviders.of(this).get(CurrenciesViewModel::class.java)
+        currenciesViewModel.setNotifier(this)
+
+        initBinding()
+
         setUpRecyclerView()
-
-        currenciesViewModel.fetchCurrencies("EUR").observe(this, androidx.lifecycle.Observer { result ->
-            populateRecyclerView(result)
-        })
-
-    }
-
-    override fun onDestroy() {
-        currenciesViewModel.cancelJob()
-        super.onDestroy()
+        newBaseNotify(CurrenciesViewModel.defaultCurrency)
     }
 
     private fun setUpRecyclerView() {
-        currenciesAdapter = CurrenciesAdapter(Collections.emptyList())
+        currenciesAdapter = CurrenciesAdapter(this)
         currencies_rv.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
         currencies_rv.layoutManager = layoutManager
         currencies_rv.adapter = currenciesAdapter
 
+        currencies_rv.setOnTouchListener { v, event ->
+            this.hideKeyboard()
+            false
+        }
     }
 
-    private fun populateRecyclerView(currencies: List<Pair<String, Double>>) {
-        currenciesAdapter.setCurrencies(currencies)
+    private fun initBinding() {
+        viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        viewDataBinding.setVariable(BR.viewModel, currenciesViewModel)
+        viewDataBinding.executePendingBindings()
+    }
 
+
+    override fun newBaseNotify(base: String) {
+        if (currenciesViewModel.baseCurrency.value != base) {
+            currenciesViewModel.baseCurrency.value = base
+        }
+    }
+
+    override fun updateCurrenciesRateItems(base: String, ratesMap: Map<String, Double>) {
+        currenciesAdapter.updateCurrencies(base, ratesMap)
+    }
+
+    override fun showErrorMessage(message: String?) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+    }
+
+    private fun hideKeyboard() {
+        val view = this.currentFocus
+        if (view != null) {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 }
