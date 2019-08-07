@@ -1,5 +1,6 @@
 package com.example.revolut.rates.data.repository
 
+import com.example.revolut.rates.common.REPEAT_RATE
 import com.example.revolut.rates.data.RatesApi
 import com.example.revolut.rates.data.model.CurrencyResponse
 import com.example.revolut.rates.di.Injector
@@ -14,10 +15,6 @@ class CurrenciesRepository {
 
     init {
         Injector.appComponent.inject(this)
-    }
-
-    companion object {
-        const val REPEAT_RATE = 1L
     }
 
     fun getCurrenciesList(base: String): Observable<CurrencyResponse> {

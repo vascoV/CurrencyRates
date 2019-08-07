@@ -1,4 +1,4 @@
-package com.example.revolut.rates.view
+package com.example.revolut.rates.common
 
 import com.example.revolut.rates.base.BaseNotifier
 

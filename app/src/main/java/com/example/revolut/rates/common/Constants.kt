@@ -2,6 +2,11 @@ package com.example.revolut.rates.common
 
 const val BASE_URL = "https://revolut.duckdns.org/"
 
+const val REPEAT_RATE = 1L
+
+const val defaultCurrency = "EUR"
+const val RETRIES = 10L
+
  val currenciesNames: HashMap<String, String> = hashMapOf(
     "EUR" to "Euro",
     "AUD" to "Australian dollalr",

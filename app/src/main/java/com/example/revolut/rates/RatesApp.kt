@@ -3,6 +3,7 @@ package com.example.revolut.rates
 
 import android.app.Application
 import com.example.revolut.rates.common.BASE_URL
+import com.example.revolut.rates.data.managers.NetworkManager
 import com.example.revolut.rates.di.AppModule
 import com.example.revolut.rates.di.Injector
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -42,4 +43,6 @@ class RatesApp :Application() {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
+
+    fun isNetworkConnected() = NetworkManager.isNetworkAvailable(this)
 }

@@ -11,11 +11,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.revolut.rates.R
-import com.example.revolut.rates.common.StringToDouble
-import com.example.revolut.rates.common.currenciesNames
-import com.example.revolut.rates.common.roundedString
+import com.example.revolut.rates.common.*
 import com.example.revolut.rates.data.model.Rate
-import com.example.revolut.rates.view.NotifyCurrencies
 import com.jakewharton.rxbinding3.widget.textChanges
 import kotlinx.android.synthetic.main.rates_item.view.*
 
@@ -91,7 +88,7 @@ class CurrenciesAdapter(
 
         private val currencyFlag: ImageView = itemView.currency_image
         private val currencyCode: TextView = itemView.currency_code
-        private val currencySymbol: TextView = itemView.currency_name
+        private val currencyName: TextView = itemView.currency_name
         private val currencyAmountEditText: EditText = itemView.currency_value
 
         fun bind(position: Int) {
@@ -108,7 +105,7 @@ class CurrenciesAdapter(
                 itemView.context.packageName
             )
             currencyCode.text = rate.code
-            currencySymbol.text = currenciesNameMap.getValue(rate.code!!)
+            currencyName.text = currenciesNameMap.getValue(rate.code!!)
             currencyFlag.setImageResource(imageId)
 
             if (rate.code != currentBase.value) {

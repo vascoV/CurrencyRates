@@ -3,6 +3,7 @@ package com.example.revolut.rates.view
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -11,9 +12,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.revolut.rates.BR
 import com.example.revolut.rates.R
+import com.example.revolut.rates.RatesApp
+import com.example.revolut.rates.common.NotifyCurrencies
+import com.example.revolut.rates.common.defaultCurrency
 import com.example.revolut.rates.view.adapter.CurrenciesAdapter
 import com.example.revolut.rates.viewmodel.CurrenciesViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity(), NotifyCurrencies {
 
@@ -32,7 +37,7 @@ class MainActivity : AppCompatActivity(), NotifyCurrencies {
         initBinding()
 
         setUpRecyclerView()
-        newBaseNotify(CurrenciesViewModel.defaultCurrency)
+        newBaseNotify(defaultCurrency)
     }
 
     private fun setUpRecyclerView() {
@@ -66,7 +71,15 @@ class MainActivity : AppCompatActivity(), NotifyCurrencies {
     }
 
     override fun showErrorMessage(message: String?) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        if (RatesApp.instance.isNetworkConnected()) {
+            Toast.makeText(this, getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, getString(R.string.disconnected), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun isLoading(isLoading: Boolean) {
+        if (isLoading) loading_layout.visibility = View.VISIBLE else loading_layout.visibility = View.GONE
     }
 
     private fun hideKeyboard() {
