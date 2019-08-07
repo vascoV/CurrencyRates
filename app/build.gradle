@@ -11,6 +11,7 @@ android {
     dataBinding {
         enabled = true
     }
+
     defaultConfig {
         applicationId "com.example.revolut.rates"
         minSdkVersion 21
@@ -19,10 +20,21 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release_config {
+            storeFile file('/Users/vascovasilev/Projects/Rates/keystore')
+            storePassword '123456'
+            keyAlias = 'upload'
+            keyPassword '123456'
+        }
+    }
+    
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release_config
         }
 
         debug {
