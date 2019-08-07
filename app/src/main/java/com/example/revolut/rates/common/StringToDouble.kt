@@ -7,14 +7,3 @@ fun String.StringToDouble(): Double
 
     return toDouble()
 }
-
-/**
- * Extension to exclude the last character of the string
- */
-fun String.removeLastChar(): String
-{
-    if (isNullOrBlank())
-        return ""
-
-    return this.substring(0, this.length - 1)
-}

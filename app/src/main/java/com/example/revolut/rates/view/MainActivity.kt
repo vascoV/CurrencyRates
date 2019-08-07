@@ -7,7 +7,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.revolut.rates.BR
@@ -68,7 +67,6 @@ class MainActivity : AppCompatActivity(), NotifyCurrencies {
 
     override fun showErrorMessage(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-
     }
 
     private fun hideKeyboard() {

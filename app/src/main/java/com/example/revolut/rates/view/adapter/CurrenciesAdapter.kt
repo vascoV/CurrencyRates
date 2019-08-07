@@ -12,11 +12,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.revolut.rates.R
 import com.example.revolut.rates.common.StringToDouble
+import com.example.revolut.rates.common.currenciesNames
 import com.example.revolut.rates.common.roundedString
 import com.example.revolut.rates.data.model.Rate
 import com.example.revolut.rates.view.NotifyCurrencies
 import com.jakewharton.rxbinding3.widget.textChanges
 import kotlinx.android.synthetic.main.rates_item.view.*
+
 
 class CurrenciesAdapter(
     private val parentNotifier: NotifyCurrencies
@@ -27,6 +29,8 @@ class CurrenciesAdapter(
     private var currentAmount: Double = 0.0
 
     private var currentBase = MutableLiveData<String>()
+
+    private val currenciesNameMap = currenciesNames
 
     init {
         currentBase.observe(parentNotifier as LifecycleOwner, Observer {
@@ -86,7 +90,7 @@ class CurrenciesAdapter(
     inner class CurrenciesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         private val currencyFlag: ImageView = itemView.currency_image
-        private val currencyCode: TextView = itemView.currency_symbol
+        private val currencyCode: TextView = itemView.currency_code
         private val currencySymbol: TextView = itemView.currency_name
         private val currencyAmountEditText: EditText = itemView.currency_value
 
@@ -104,6 +108,7 @@ class CurrenciesAdapter(
                 itemView.context.packageName
             )
             currencyCode.text = rate.code
+            currencySymbol.text = currenciesNameMap.getValue(rate.code!!)
             currencyFlag.setImageResource(imageId)
 
             if (rate.code != currentBase.value) {

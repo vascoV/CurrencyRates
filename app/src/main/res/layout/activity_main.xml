@@ -5,7 +5,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
         <variable
             name="viewModel"
             type="com.example.revolut.rates.viewmodel.CurrenciesViewModel" />
@@ -15,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".view.MainActivity">
-
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/currencies_rv"

@@ -51,17 +51,16 @@ class CurrenciesViewModel : BaseViewModel<NotifyCurrencies>() {
                 .retry(RETRIES)
                 .subscribeWith(object : DisposableObserver<CurrencyResponse>() {
                     override fun onComplete() {
-                        Log.d("Observer: ", "COMPLETE")
+                        Log.i("Observer: ", "COMPLETE")
                     }
 
                     override fun onNext(t: CurrencyResponse) {
                         currencies.value = t
-                        Log.d("Observer: ", "NEXT -> ${t.toString()}")
                     }
 
                     override fun onError(e: Throwable) {
-                        Log.d("Observer: ", "ERROR -> ${e.toString()}")
                         notifier?.get()?.showErrorMessage(e.message)
+                        Log.e("Observer: ", "ERROR -> ${e.toString()}")
                     }
                 })
         )
